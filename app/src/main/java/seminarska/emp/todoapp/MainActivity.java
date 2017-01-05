@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -22,6 +24,8 @@ public class MainActivity extends AppCompatActivity
     TextView pointsText;
 
     SharedPreferences sharedPreferences;
+
+    NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,23 +43,26 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        pointsText = (TextView) findViewById(R.id.points);
-
         sharedPreferences = getSharedPreferences("points", Context.MODE_PRIVATE);
-
-        pointsText.setText(sharedPreferences.getInt("points", 0));
 
         SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 if (key.equals("points")) {
-                    pointsText.setText(sharedPreferences.getInt(key, 0));
+                    pointsText.setText(sharedPreferences.getInt(key, 0)+"");
                 }
             }
         };
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
 
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+
+        View headerView = navigationView.getHeaderView(0);
+
+        pointsText = (TextView) headerView.findViewById(R.id.points);
+
+        pointsText.setText(sharedPreferences.getInt("points", 0)+"");
     }
     @Override
     public void onBackPressed() {
@@ -96,7 +103,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            // Handle the camera action
+
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
