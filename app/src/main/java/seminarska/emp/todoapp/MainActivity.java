@@ -108,6 +108,18 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_rewards) {
 
         }
+        else if (id == R.id.nav_all) {
+
+        }
+        else if (id == R.id.nav_daily) {
+
+        }
+        else if (id == R.id.nav_work) {
+
+        }
+        else if (id == R.id.nav_personal) {
+
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
