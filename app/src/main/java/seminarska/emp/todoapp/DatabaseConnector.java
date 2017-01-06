@@ -28,8 +28,7 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         if (database != null) database.close(); // close the database connection
     }
 
-    // isRepeating in hasReminder sta boolean vrednosti, v repeatingDays in reminders
-    // pa se shranijo dnevi/čas v text obliki, ki se pretvori pozneje v Date format
+    // v repeatingDays in reminder se shranijo dnevi/čas v text obliki, ki se pretvori pozneje v Date format
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -37,9 +36,7 @@ public class DatabaseConnector extends SQLiteOpenHelper {
                 "(_id integer primary key autoincrement, " +
                 "category TEXT, " +
                 "info TEXT, " +
-                "isRepeating INTEGER, " +
                 "repeatingDays TEXT, " +
-                "hasReminder INTEGER, " +
                 "reminders TEXT, " +
                 "deadline TEXT);";
 

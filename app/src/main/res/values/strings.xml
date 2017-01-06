@@ -3,6 +3,9 @@
 
 
     <string name="points_label">Points:</string>
+    <string name="add_task">Add Task</string>
+    <string name="task_info">Task Info</string>
+    <string name="repeat_label">Recurring days:</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
