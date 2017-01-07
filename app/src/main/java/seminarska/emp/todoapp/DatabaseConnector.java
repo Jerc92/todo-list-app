@@ -1,9 +1,11 @@
 package seminarska.emp.todoapp;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * Created by jerne on 4. 01. 2017.
@@ -32,19 +34,49 @@ public class DatabaseConnector extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        Log.d("DatabaseConnector", "onCreate called");
+        //two tables actually might be simpler
+        //daily switch might make more sense for categories than individual tasks
         final String createQueryTasks = "CREATE TABLE tasks" +
                 "(_id integer primary key autoincrement, " +
-                "category TEXT, " +
+                "category INT, " +
                 "info TEXT, " +
-                "repeatingDays TEXT, " +
                 "reminders TEXT, " +
                 "deadline TEXT);";
-
+        final String createQueryCategories = "CREATE TABLE categories" +
+                "(_id integer primary key autoincrement, " +
+                "category TEXT, " +
+                "repeats INT);";
         db.execSQL(createQueryTasks);
+        db.execSQL(createQueryCategories);
+
+        //add default categories
+        insertDefaultData();
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        //clean database, has to be changed when app is finished
+        db.execSQL("DROP TABLE IF EXISTS tasks");
+        db.execSQL("DROP TABLE IF EXISTS categories");
+        onCreate(db);
+    }
 
+    public Cursor getCategories() {
+        //getting writable database everytime might not be the best idea..
+        database = getWritableDatabase();
+        return database.rawQuery("SELECT category FROM categories", null);
+    }
+
+    private void insertDefaultData() {
+        //temporary way to add default categories
+        //CHANGE WHEN APP IS FINISHED
+        SQLiteDatabase db = getWritableDatabase();
+        String insertQuery = "INSERT INTO categories VALUES (NULL, 'Daily', 1);";
+        String insertQuery2 = "INSERT INTO categories VALUES (NULL, 'Personal', 0);";
+        String insertQuery3 = "INSERT INTO categories VALUES (NULL, 'Work', 0);";
+        db.execSQL(insertQuery);
+        db.execSQL(insertQuery2);
+        db.execSQL(insertQuery3);
     }
 }

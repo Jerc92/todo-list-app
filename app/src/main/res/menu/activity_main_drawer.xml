@@ -1,31 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_all"
-            android:icon="@drawable/ic_label_black_24dp"
-            android:title="All" />
-        <item
-            android:id="@+id/nav_daily"
-            android:icon="@drawable/ic_label_outline_black_24dp"
-            android:title="Daily" />
-        <item
-            android:id="@+id/nav_work"
-            android:icon="@drawable/ic_label_outline_black_24dp"
-            android:title="Work" />
-        <item
-            android:id="@+id/nav_personal"
-            android:icon="@drawable/ic_label_outline_black_24dp"
-            android:title="Personal" />
-    </group>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="@string/categories" android:id="@+id/categoriesSubMenu">
+        <menu>
+            <group android:checkableBehavior="single" android:id="@+id/categoriesGroup">
+                <item
+                    android:id="@+id/nav_all"
+                    android:icon="@drawable/ic_label_black_24dp"
+                    android:title="@string/all" />
+            </group>
+        </menu>
+    </item>
 
-    <item android:title="Rewards">
+    <item android:title="@string/rewards">
         <menu>
             <item
                 android:id="@+id/nav_rewards"
                 android:icon="@drawable/ic_menu_gallery"
-                android:title="Rewards" />
+                android:title="@string/rewards" />
         </menu>
     </item>
 

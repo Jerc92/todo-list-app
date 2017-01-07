@@ -3,10 +3,11 @@ package seminarska.emp.todoapp;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.SubMenu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    DatabaseConnector db;
 
     TextView pointsText;
 
@@ -38,11 +40,18 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
         toggle.syncState();
+
+        //onUpgrade called every launch to truncate db for easier debugging
+        //CHANGE WHEN APP IS FINISHED
+        db = new DatabaseConnector(this);
+        db.onUpgrade(db.getWritableDatabase(), 1, 2);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        //navigation views submenu needed to be populated from db in populateNavMenu method
+        SubMenu navViewSubMenu = navigationView.getMenu().findItem(R.id.categoriesSubMenu).getSubMenu();
+        populateNavMenu(navViewSubMenu);
 
         sharedPreferences = getSharedPreferences("points", Context.MODE_PRIVATE);
 
@@ -56,8 +65,6 @@ public class MainActivity extends AppCompatActivity
         };
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
-
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
 
         View headerView = navigationView.getHeaderView(0);
 
@@ -99,24 +106,16 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_rewards) {
+        //dynamic category item clicks could be handled by item.getTitle()
+        Toast.makeText(getApplicationContext(), item.getTitle(), Toast.LENGTH_SHORT).show();
 
+        if (id == R.id.nav_rewards) {
         }
         else if (id == R.id.nav_all) {
-
-        }
-        else if (id == R.id.nav_daily) {
-
-        }
-        else if (id == R.id.nav_work) {
-
-        }
-        else if (id == R.id.nav_personal) {
-
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -127,5 +126,17 @@ public class MainActivity extends AppCompatActivity
     public void createTask(View view) {
         Intent intent = new Intent(MainActivity.this, AddTask.class);
         startActivity(intent);
+    }
+    public void populateNavMenu(SubMenu navViewSubMenu) {
+        //should make general addNavMenuItem function later, to be called at startup and when new categories are made by user
+        Cursor categories = db.getCategories();
+        categories.moveToFirst();
+
+        for (int i = 0; i < categories.getCount(); i++) {
+            //create menu entries from categories cursor data
+            navViewSubMenu.add(R.id.categoriesGroup, i, Menu.NONE, categories.getString(0)).setIcon(R.drawable.ic_label_outline_black_24dp);
+            categories.moveToNext();
+        }
+        categories.close();
     }
 }
