@@ -51,7 +51,7 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         db.execSQL(createQueryCategories);
 
         //add default categories
-        insertDefaultData();
+        insertDefaultData(db);
     }
 
     @Override
@@ -68,10 +68,9 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         return database.rawQuery("SELECT category FROM categories", null);
     }
 
-    private void insertDefaultData() {
+    private void insertDefaultData(SQLiteDatabase db) {
         //temporary way to add default categories
         //CHANGE WHEN APP IS FINISHED
-        SQLiteDatabase db = getWritableDatabase();
         String insertQuery = "INSERT INTO categories VALUES (NULL, 'Daily', 1);";
         String insertQuery2 = "INSERT INTO categories VALUES (NULL, 'Personal', 0);";
         String insertQuery3 = "INSERT INTO categories VALUES (NULL, 'Work', 0);";
