@@ -15,29 +15,77 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"/>
+
         <TextView
             android:text="@string/task_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/info_label" />
+            android:id="@+id/info_label"
+            android:paddingTop="10sp" />
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPersonName"
             android:ems="10"
-            android:id="@+id/info_editText" />
+            android:id="@+id/info_editText"
+            android:paddingBottom="10sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/repeat_label"
-            android:text="@string/repeat_label" />
+            android:onClick="showDays"
+            android:text="@string/repeat_label"
+            android:textSize="14sp"
+            android:paddingTop="10sp"
+            android:paddingBottom="10sp"
+            android:lineSpacingExtra="8sp" />
 
-        <Spinner
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"/>
+
+        <TextView
+            android:text="@string/deadline_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/repeat_spinner" />
+            android:id="@+id/deadline_label"
+            android:onClick="setDeadline"
+            android:paddingTop="10sp"
+            android:paddingBottom="10sp"
+            android:lineSpacingExtra="8sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/reminder_label"
+            android:onClick="showReminders"
+            android:text="@string/reminder_label"
+            android:textSize="14sp"
+            android:paddingTop="10sp"
+            android:paddingBottom="10sp"
+            android:lineSpacingExtra="8sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"/>
 
     </LinearLayout>
 </RelativeLayout>

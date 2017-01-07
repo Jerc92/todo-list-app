@@ -103,9 +103,7 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_tasks) {
-
-        } else if (id == R.id.nav_rewards) {
+        if (id == R.id.nav_rewards) {
 
         }
         else if (id == R.id.nav_all) {
