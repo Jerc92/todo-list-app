@@ -1,5 +1,6 @@
 package seminarska.emp.todoapp;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -60,6 +61,23 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS tasks");
         db.execSQL("DROP TABLE IF EXISTS categories");
         onCreate(db);
+    }
+
+    public void insertTask(int category, String info, String reminders, String deadline) {
+        final ContentValues newTask = new ContentValues();
+        newTask.put("category", category);
+        newTask.put("info", info);
+        newTask.put("reminders", reminders);
+        newTask.put("deadline", deadline);
+
+        open();
+        database.insert("tasks", null, newTask);
+        close();
+    }
+
+    public Cursor getAllTasks() {
+        return database.query("tasks", new String[]{"_id", "info", "category"},
+                            null, null, null, null, "_id");
     }
 
     public Cursor getCategories() {
