@@ -122,7 +122,7 @@ public class DatabaseConnector extends SQLiteOpenHelper {
     public Cursor getCategories() {
         //getting writable database everytime might not be the best idea..
         database = getWritableDatabase();
-        return database.rawQuery("SELECT category FROM categories", null);
+        return database.rawQuery("SELECT category FROM categories WHERE category != 'others'", null);
     }
 
     public int getCategoryID(String name) {
@@ -135,9 +135,11 @@ public class DatabaseConnector extends SQLiteOpenHelper {
     private void insertDefaultData(SQLiteDatabase db) {
         //temporary way to add default categories
         //CHANGE WHEN APP IS FINISHED
+        String insertQuery0 = "INSERT INTO categories VALUES (0, 'Daily', 1);";
         String insertQuery = "INSERT INTO categories VALUES (NULL, 'Daily', 1);";
         String insertQuery2 = "INSERT INTO categories VALUES (NULL, 'Personal', 0);";
         String insertQuery3 = "INSERT INTO categories VALUES (NULL, 'Work', 0);";
+        db.execSQL(insertQuery0);
         db.execSQL(insertQuery);
         db.execSQL(insertQuery2);
         db.execSQL(insertQuery3);

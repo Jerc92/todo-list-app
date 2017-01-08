@@ -35,6 +35,8 @@ import android.widget.Toast;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+    public static int selectedCategoryID;
+
     TextView pointsText;
     SharedPreferences sharedPreferences;
 
@@ -165,10 +167,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Toast.makeText(getApplicationContext(), item.getTitle(), Toast.LENGTH_SHORT).show();
 
         if (id == R.id.nav_rewards) {
-        } else if (id == R.id.nav_all) {
 
         } else if (id == R.id.nav_addNew) {
             addCategoryPrompt();
+        } else if (id == R.id.nav_addNew) {
+            selectedCategoryID = 0;
+        } else {
+            //set selected category by ID
+            selectedCategoryID = id;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -186,7 +192,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("New category");
 
-        View viewInflated = LayoutInflater.from(this).inflate(R.layout.new_category_prompt, (ViewGroup) findViewById(R.id.content_main_linear), false);
+        View viewInflated = LayoutInflater.from(this).inflate(R.layout.new_category_prompt,
+                (ViewGroup) findViewById(R.id.content_main_linear), false);
         // Set up the input
         final EditText input = (EditText) viewInflated.findViewById(R.id.newCategoryInput);
         final CheckBox checkBox = (CheckBox) viewInflated.findViewById(R.id.newCategoryDaily);
@@ -198,7 +205,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 dialog.dismiss();
                 String name = input.getText().toString();
                 db.addCategory(name, checkBox.isChecked());
-                navViewSubMenu.add(R.id.categoriesGroup, db.getCategoryID(name), Menu.NONE, name).setIcon(R.drawable.ic_label_outline_black_24dp);
+                navViewSubMenu.add(R.id.categoriesGroup, db.getCategoryID(name),
+                        Menu.NONE, name).setIcon(R.drawable.ic_label_outline_black_24dp);
             }
         });
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -211,12 +219,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void populateNavMenu(SubMenu navViewSubMenu) {
-        //should make general addNavMenuItem function later, to be called at startup and when new categories are made by user
+        //added first is the all category, should always have id of 0
         Cursor categories = db.getCategories();
         categories.moveToFirst();
-        for (int i = 0; i < categories.getCount(); i++) {
+        for (int i = 1; i <= categories.getCount(); i++) {
             //create menu entries from categories cursor data
-            navViewSubMenu.add(R.id.categoriesGroup, db.getCategoryID(categories.getString(0)), Menu.NONE, categories.getString(0)).setIcon(R.drawable.ic_label_outline_black_24dp);
+            navViewSubMenu.add(R.id.categoriesGroup, db.getCategoryID(categories.getString(0)),
+                    Menu.NONE, categories.getString(0)).setIcon(R.drawable.ic_label_outline_black_24dp);
             categories.moveToNext();
         }
         categories.close();
