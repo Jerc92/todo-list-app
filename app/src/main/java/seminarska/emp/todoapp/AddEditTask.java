@@ -13,9 +13,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import java.util.Calendar;
+
+// TODO add new textView/Spinner for the category, depending on if the category is already selected
+// TODO add AlarmManager for the reminders (maybe disable reminders for recurring tasks?)
 
 public class AddEditTask extends AppCompatActivity {
 

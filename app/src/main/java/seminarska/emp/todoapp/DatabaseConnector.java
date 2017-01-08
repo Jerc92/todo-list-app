@@ -115,7 +115,7 @@ public class DatabaseConnector extends SQLiteOpenHelper {
 
     public void deleteTask(long id) {
         open();
-        database.delete("tasks", "_id"+id, null);
+        database.delete("tasks", "_id="+id, null);
         close();
     }
 

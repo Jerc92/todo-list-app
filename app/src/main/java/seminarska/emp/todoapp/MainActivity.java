@@ -31,6 +31,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+// TODO add category to extras, so it populates the right list, add global variable currentCategory which changes once you switch on the list
+
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     TextView pointsText;
     SharedPreferences sharedPreferences;
