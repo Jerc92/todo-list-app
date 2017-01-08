@@ -134,7 +134,7 @@ public class DatabaseConnector extends SQLiteOpenHelper {
     private void insertDefaultData(SQLiteDatabase db) {
         //temporary way to add default categories
         //CHANGE WHEN APP IS FINISHED
-        String insertQuery0 = "INSERT INTO categories VALUES (0, 'Daily', 1);";
+        String insertQuery0 = "INSERT INTO categories VALUES (0, 'others', 0);";
         String insertQuery = "INSERT INTO categories VALUES (NULL, 'Daily', 1);";
         String insertQuery2 = "INSERT INTO categories VALUES (NULL, 'Personal', 0);";
         String insertQuery3 = "INSERT INTO categories VALUES (NULL, 'Work', 0);";

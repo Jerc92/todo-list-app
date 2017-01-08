@@ -212,8 +212,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 dialog.dismiss();
                 String name = input.getText().toString();
                 db.addCategory(name, checkBox.isChecked());
-                navViewSubMenu.add(R.id.categoriesGroup, db.getCategoryID(name),
-                        Menu.NONE, name).setIcon(R.drawable.ic_label_outline_black_24dp);
+                addNavMenuItem(navViewSubMenu, name);
             }
         });
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -229,13 +228,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //added first is the all category, should always have id of 0
         Cursor categories = db.getCategories();
         categories.moveToFirst();
+        Log.d("ActivityMain", String.valueOf(categories.getCount()));
         for (int i = 1; i <= categories.getCount(); i++) {
             //create menu entries from categories cursor data
-            navViewSubMenu.add(R.id.categoriesGroup, db.getCategoryID(categories.getString(0)),
-                    Menu.NONE, categories.getString(0)).setIcon(R.drawable.ic_label_outline_black_24dp);
+            addNavMenuItem(navViewSubMenu, categories.getString(0));
             categories.moveToNext();
         }
         categories.close();
+    }
+    public void addNavMenuItem(SubMenu navViewSubMenu, String name) {
+        navViewSubMenu.add(R.id.categoriesGroup, db.getCategoryID(name),
+                Menu.NONE, name).setIcon(R.drawable.ic_label_outline_black_24dp);
     }
 
     AdapterView.OnItemClickListener viewTaskListener = new AdapterView.OnItemClickListener() {
