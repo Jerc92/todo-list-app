@@ -33,7 +33,6 @@ public class DatabaseConnector extends SQLiteOpenHelper {
     }
 
     // v repeatingDays in reminder se shranijo dnevi/čas v text obliki, ki se pretvori pozneje v Date format
-
     @Override
     public void onCreate(SQLiteDatabase db) {
         Log.d("DatabaseConnector", "onCreate called");
@@ -48,7 +47,7 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         final String createQueryCategories = "CREATE TABLE categories" +
                 "(_id integer primary key autoincrement, " +
                 "category TEXT, " +
-                "repeats INT);";
+                "daily INT);";
         db.execSQL(createQueryTasks);
         db.execSQL(createQueryCategories);
 
@@ -62,6 +61,17 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS tasks");
         db.execSQL("DROP TABLE IF EXISTS categories");
         onCreate(db);
+    }
+
+    public boolean addCategory(String name, boolean daily) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        int isDaily = (daily) ? 1 : 0;
+        contentValues.put("category", name);
+        contentValues.put("daily", isDaily);
+
+        //checking success or failure of function call, insert returns -1 on failure
+        return (db.insert("categories", null, contentValues) != -1);
     }
 
     public void insertTask(int category, String info, String reminders, String deadline) {
@@ -113,6 +123,13 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         //getting writable database everytime might not be the best idea..
         database = getWritableDatabase();
         return database.rawQuery("SELECT category FROM categories", null);
+    }
+
+    public int getCategoryID(String name) {
+        database = getWritableDatabase();
+        Cursor c = database.rawQuery("SELECT _id FROM categories WHERE category = '" + name +"'", null);
+        c.moveToFirst();
+        return c.getInt(0);
     }
 
     private void insertDefaultData(SQLiteDatabase db) {
