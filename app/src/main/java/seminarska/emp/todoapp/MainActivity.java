@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
-import android.util.Log;
 import android.view.SubMenu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -20,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         taskListView = (ListView) findViewById(R.id.task_list);
-        //taskListView.setOnItemClickListener();
+        taskListView.setOnItemClickListener(viewTaskListener);
 
         //onUpgrade called every launch to truncate db for easier debugging
         //CHANGE WHEN APP IS FINISHED
@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void createTask(View view) {
-        Intent intent = new Intent(MainActivity.this, AddTask.class);
+        Intent intent = new Intent(MainActivity.this, AddEditTask.class);
         startActivity(intent);
     }
     public void populateNavMenu(SubMenu navViewSubMenu) {
@@ -177,4 +177,14 @@ public class MainActivity extends AppCompatActivity
         }
         categories.close();
     }
+
+    AdapterView.OnItemClickListener viewTaskListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            final Intent viewTask = new Intent(MainActivity.this, ViewTask.class);
+
+            viewTask.putExtra("row_id", id);
+            startActivity(viewTask);
+        }
+    };
 }

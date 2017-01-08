@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
 
 /**
@@ -76,8 +77,36 @@ public class DatabaseConnector extends SQLiteOpenHelper {
     }
 
     public Cursor getAllTasks() {
-        return database.query("tasks", new String[]{"_id", "info", "category"},
+        return database.query("tasks", new String[]{"_id", "info"},
                             null, null, null, null, "_id");
+    }
+
+    public Cursor getTasksByCategory(String category) {
+        return database.query("tasks", new String[]{"_id", "info"},
+                            "category="+category, null, null, null, null);
+    }
+
+    public Cursor getOneTask(long id) {
+        return database.query("tasks", null, "_id="+id, null, null, null, null);
+    }
+
+    public void updateTask(long id, int category, String info, String reminders, String deadline) {
+        final ContentValues editTask = new ContentValues();
+
+        editTask.put("category", category);
+        editTask.put("info", info);
+        editTask.put("reminders", reminders);
+        editTask.put("deadline", deadline);
+
+        open();
+        database.update("tasks", editTask, "_id=" + id, null);
+        close();
+    }
+
+    public void deleteTask(long id) {
+        open();
+        database.delete("tasks", "_id"+id, null);
+        close();
     }
 
     public Cursor getCategories() {

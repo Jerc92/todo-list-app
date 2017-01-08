@@ -4,7 +4,10 @@
 
     <string name="points_label">Points:</string>
     <string name="add_task">Add Task</string>
-    <string name="task_info">Task Info</string>
+    <string name="task_info">Task Info:</string>
+    <string name="task_info_view">Task Info:\n</string>
+    <string name="task_edit">Edit task</string>
+    <string name="task_delete">Delete task</string>
     <string name="repeat_label">Recurring days:\n</string>
     <string name="reminder_label">Reminders:\n</string>
     <string name="confirm_days">Confirm days</string>
