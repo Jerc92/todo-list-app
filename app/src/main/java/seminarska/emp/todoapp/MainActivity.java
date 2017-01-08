@@ -37,6 +37,7 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     TextView pointsText;
     SharedPreferences sharedPreferences;
+    String currentCategory = "others";
 
     NavigationView navigationView;
     SubMenu navViewSubMenu;
@@ -145,7 +146,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         @Override
         protected Cursor doInBackground(Object... params) {
             db.open();
-            return db.getAllTasks();
+            if (!currentCategory.equals("others")) {
+                return db.getTasksByCategory(currentCategory);
+            } else {
+                return db.getAllTasks();
+            }
         }
 
         @Override
@@ -165,10 +170,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Toast.makeText(getApplicationContext(), item.getTitle(), Toast.LENGTH_SHORT).show();
 
         if (id == R.id.nav_rewards) {
-        } else if (id == R.id.nav_all) {
 
+        } else if (id == R.id.nav_all) {
+            currentCategory = "others";
+            new GetTasks().execute();
         } else if (id == R.id.nav_addNew) {
             addCategoryPrompt();
+        } else {
+            currentCategory = item.getTitle().toString();
+            new GetTasks().execute();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -178,6 +188,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void createTask(View view) {
         Intent intent = new Intent(MainActivity.this, AddEditTask.class);
+        if (!currentCategory.equals("others")) {
+            intent.putExtra("category", currentCategory);
+        }
         startActivity(intent);
     }
 

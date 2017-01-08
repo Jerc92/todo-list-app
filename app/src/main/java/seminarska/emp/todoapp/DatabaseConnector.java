@@ -40,7 +40,7 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         //daily switch might make more sense for categories than individual tasks
         final String createQueryTasks = "CREATE TABLE tasks" +
                 "(_id integer primary key autoincrement, " +
-                "category INT, " +
+                "category TEXT, " +
                 "info TEXT, " +
                 "reminders TEXT, " +
                 "deadline TEXT);";
@@ -74,7 +74,7 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         return (db.insert("categories", null, contentValues) != -1);
     }
 
-    public void insertTask(int category, String info, String reminders, String deadline) {
+    public void insertTask(String category, String info, String reminders, String deadline) {
         final ContentValues newTask = new ContentValues();
         newTask.put("category", category);
         newTask.put("info", info);
@@ -100,7 +100,7 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         return database.query("tasks", null, "_id="+id, null, null, null, null);
     }
 
-    public void updateTask(long id, int category, String info, String reminders, String deadline) {
+    public void updateTask(long id, String category, String info, String reminders, String deadline) {
         final ContentValues editTask = new ContentValues();
 
         editTask.put("category", category);

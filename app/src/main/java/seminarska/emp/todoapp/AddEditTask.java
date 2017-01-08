@@ -34,7 +34,9 @@ public class AddEditTask extends AppCompatActivity {
 
     Calendar deadlineCalendar;
     String reminderTimes;
+    String category = "others";
 
+    TextView categoryTextView;
     EditText infoEditText;
     TextView deadlineTextView;
     TextView reminderTextView;
@@ -53,6 +55,7 @@ public class AddEditTask extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
 
+        categoryTextView = (TextView) findViewById(R.id.category_label);
         infoEditText = (EditText) findViewById(R.id.info_editText);
         reminderTextView = (TextView) findViewById(R.id.reminder_label);
         deadlineTextView = (TextView) findViewById(R.id.deadline_label);
@@ -76,7 +79,11 @@ public class AddEditTask extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
 
-        if (extras != null) {
+        if(extras.containsKey("category")) {
+            categoryTextView.setText(categoryTextView.getText().toString()+extras.getString("category"));
+            category = extras.getString("category");
+        }
+        if (extras.containsKey("row_id")) {
             handleExistingTask(extras);
         }
 
@@ -303,11 +310,11 @@ public class AddEditTask extends AppCompatActivity {
 
         if(getIntent().getExtras() == null) {
 
-            db.insertTask(0, infoEditText.getText().toString(), reminderTimes, Long.toString(deadlineCalendar.getTimeInMillis()));
+            db.insertTask(category, infoEditText.getText().toString(), reminderTimes, Long.toString(deadlineCalendar.getTimeInMillis()));
 
         } else {
 
-            db.updateTask(rowID, 0, infoEditText.getText().toString(), reminderTimes, Long.toString(deadlineCalendar.getTimeInMillis()));
+            db.updateTask(rowID, category, infoEditText.getText().toString(), reminderTimes, Long.toString(deadlineCalendar.getTimeInMillis()));
 
         }
     }
