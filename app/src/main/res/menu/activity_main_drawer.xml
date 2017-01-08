@@ -4,6 +4,10 @@
         <menu>
             <group android:checkableBehavior="single" android:id="@+id/categoriesGroup">
                 <item
+                    android:id="@+id/nav_addNew"
+                    android:icon="@drawable/ic_add_black_24dp"
+                    android:title="@string/new_category" />
+                <item
                     android:id="@+id/nav_all"
                     android:icon="@drawable/ic_label_black_24dp"
                     android:title="@string/all" />

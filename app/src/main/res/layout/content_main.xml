@@ -21,16 +21,17 @@
         android:weightSum="1">
 
         <ListView
+            android:id="@+id/taskListView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/button"
+            android:layout_above="@+id/addTaskButton"
             android:layout_weight="0.15" />
 
         <Button
             android:text="@string/add_task"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
-            android:id="@+id/button"
+            android:id="@+id/addTaskButton"
             android:layout_weight="0.85"
             android:onClick="createTask"/>
 

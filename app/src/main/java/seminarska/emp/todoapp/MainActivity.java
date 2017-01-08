@@ -1,12 +1,15 @@
 package seminarska.emp.todoapp;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.SubMenu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -17,6 +20,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +35,7 @@ public class MainActivity extends AppCompatActivity
     SharedPreferences sharedPreferences;
 
     NavigationView navigationView;
+    SubMenu navViewSubMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +57,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         //navigation views submenu needed to be populated from db in populateNavMenu method
-        SubMenu navViewSubMenu = navigationView.getMenu().findItem(R.id.categoriesSubMenu).getSubMenu();
+        navViewSubMenu = navigationView.getMenu().findItem(R.id.categoriesSubMenu).getSubMenu();
         populateNavMenu(navViewSubMenu);
 
         sharedPreferences = getSharedPreferences("points", Context.MODE_PRIVATE);
@@ -114,8 +121,10 @@ public class MainActivity extends AppCompatActivity
         Toast.makeText(getApplicationContext(), item.getTitle(), Toast.LENGTH_SHORT).show();
 
         if (id == R.id.nav_rewards) {
-        }
-        else if (id == R.id.nav_all) {
+        } else if (id == R.id.nav_all) {
+
+        } else if (id == R.id.nav_addNew) {
+            addCategoryPrompt();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -127,14 +136,43 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(MainActivity.this, AddTask.class);
         startActivity(intent);
     }
+
+    public void addCategoryPrompt () {
+        //create alert prompt and add new category to database when ok button is pressed
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("New category");
+
+        View viewInflated = LayoutInflater.from(this).inflate(R.layout.new_category_prompt, (ViewGroup) findViewById(R.id.content_main_linear), false);
+        // Set up the input
+        final EditText input = (EditText) viewInflated.findViewById(R.id.newCategoryInput);
+        final CheckBox checkBox = (CheckBox) viewInflated.findViewById(R.id.newCategoryDaily);
+        builder.setView(viewInflated);
+        // Set up the buttons
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                String name = input.getText().toString();
+                db.addCategory(name, checkBox.isChecked());
+                navViewSubMenu.add(R.id.categoriesGroup, db.getCategoryID(name), Menu.NONE, name).setIcon(R.drawable.ic_label_outline_black_24dp);
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
     public void populateNavMenu(SubMenu navViewSubMenu) {
         //should make general addNavMenuItem function later, to be called at startup and when new categories are made by user
         Cursor categories = db.getCategories();
         categories.moveToFirst();
-
         for (int i = 0; i < categories.getCount(); i++) {
             //create menu entries from categories cursor data
-            navViewSubMenu.add(R.id.categoriesGroup, i, Menu.NONE, categories.getString(0)).setIcon(R.drawable.ic_label_outline_black_24dp);
+            navViewSubMenu.add(R.id.categoriesGroup, db.getCategoryID(categories.getString(0)), Menu.NONE, categories.getString(0)).setIcon(R.drawable.ic_label_outline_black_24dp);
             categories.moveToNext();
         }
         categories.close();
