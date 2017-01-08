@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onResume(){
         super.onResume();
 
-        new GetTasks().execute();
+        new GetTasks().execute(currentCategory);
     }
 
     @Override
@@ -142,12 +142,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
-    private class GetTasks extends AsyncTask<Object, Object, Cursor> {
+    private class GetTasks extends AsyncTask<String, Object, Cursor> {
         @Override
-        protected Cursor doInBackground(Object... params) {
+        protected Cursor doInBackground(String... params) {
             db.open();
-            if (!currentCategory.equals("others")) {
-                return db.getTasksByCategory(currentCategory);
+            if (!params[0].equals("others")) {
+                return db.getTasksByCategory(params[0]);
             } else {
                 return db.getAllTasks();
             }
@@ -173,12 +173,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         } else if (id == R.id.nav_all) {
             currentCategory = "others";
-            new GetTasks().execute();
+            new GetTasks().execute(currentCategory);
         } else if (id == R.id.nav_addNew) {
             addCategoryPrompt();
         } else {
             currentCategory = item.getTitle().toString();
-            new GetTasks().execute();
+            new GetTasks().execute(currentCategory);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -241,6 +241,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             final Intent viewTask = new Intent(MainActivity.this, ViewTask.class);
 
             viewTask.putExtra("row_id", id);
+            viewTask.putExtra("category", currentCategory);
             startActivity(viewTask);
         }
     };

@@ -153,9 +153,9 @@ public class ViewTask extends AppCompatActivity {
         builder.setTitle("Delete task");
         builder.setMessage("Do you really want to delete this task?");
 
-        builder.setNegativeButton("No", null);
+        builder.setNegativeButton(android.R.string.cancel, null);
 
-        builder.setPositiveButton("Yes", deleteListener);
+        builder.setPositiveButton(android.R.string.ok, deleteListener);
 
         builder.show();
     }

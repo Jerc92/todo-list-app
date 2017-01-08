@@ -32,7 +32,6 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         if (database != null) database.close(); // close the database connection
     }
 
-    // v repeatingDays in reminder se shranijo dnevi/čas v text obliki, ki se pretvori pozneje v Date format
     @Override
     public void onCreate(SQLiteDatabase db) {
         Log.d("DatabaseConnector", "onCreate called");
@@ -93,7 +92,7 @@ public class DatabaseConnector extends SQLiteOpenHelper {
 
     public Cursor getTasksByCategory(String category) {
         return database.query("tasks", new String[]{"_id", "info"},
-                            "category="+category, null, null, null, null);
+                            "category='"+category+"'", null, null, null, null);
     }
 
     public Cursor getOneTask(long id) {

@@ -79,12 +79,14 @@ public class AddEditTask extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
 
-        if(extras.containsKey("category")) {
-            categoryTextView.setText(categoryTextView.getText().toString()+extras.getString("category"));
-            category = extras.getString("category");
-        }
-        if (extras.containsKey("row_id")) {
-            handleExistingTask(extras);
+        if(extras != null) {
+            if(extras.containsKey("category")) {
+                categoryTextView.setText(categoryTextView.getText().toString()+extras.getString("category"));
+                category = extras.getString("category");
+            }
+            if (extras.containsKey("row_id")) {
+                handleExistingTask(extras);
+            }
         }
 
         // Set minTime to current time, if date == current date
@@ -308,7 +310,7 @@ public class AddEditTask extends AppCompatActivity {
     private void saveTaskToDB() {
         DatabaseConnector db = new DatabaseConnector(this);
 
-        if(getIntent().getExtras() == null) {
+        if(getIntent().getExtras() == null || !getIntent().getExtras().containsKey("row_id")) {
 
             db.insertTask(category, infoEditText.getText().toString(), reminderTimes, Long.toString(deadlineCalendar.getTimeInMillis()));
 
