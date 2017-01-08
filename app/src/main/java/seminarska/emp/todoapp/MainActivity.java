@@ -35,10 +35,9 @@ import android.widget.Toast;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    public static int selectedCategoryID;
-
     TextView pointsText;
     SharedPreferences sharedPreferences;
+    String currentCategory = "others";
 
     NavigationView navigationView;
     SubMenu navViewSubMenu;
@@ -102,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onResume(){
         super.onResume();
 
-        new GetTasks().execute();
+        new GetTasks().execute(currentCategory);
     }
 
     @Override
@@ -143,11 +142,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
-    private class GetTasks extends AsyncTask<Object, Object, Cursor> {
+    private class GetTasks extends AsyncTask<String, Object, Cursor> {
         @Override
-        protected Cursor doInBackground(Object... params) {
+        protected Cursor doInBackground(String... params) {
             db.open();
-            return db.getAllTasks();
+            if (!params[0].equals("others")) {
+                return db.getTasksByCategory(params[0]);
+            } else {
+                return db.getAllTasks();
+            }
         }
 
         @Override
@@ -168,13 +171,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (id == R.id.nav_rewards) {
 
+        } else if (id == R.id.nav_all) {
+            currentCategory = "others";
+            new GetTasks().execute(currentCategory);
         } else if (id == R.id.nav_addNew) {
             addCategoryPrompt();
-        } else if (id == R.id.nav_addNew) {
-            selectedCategoryID = 0;
         } else {
-            //set selected category by ID
-            selectedCategoryID = id;
+            currentCategory = item.getTitle().toString();
+            new GetTasks().execute(currentCategory);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -184,6 +188,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void createTask(View view) {
         Intent intent = new Intent(MainActivity.this, AddEditTask.class);
+        if (!currentCategory.equals("others")) {
+            intent.putExtra("category", currentCategory);
+        }
         startActivity(intent);
     }
 
@@ -237,6 +244,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             final Intent viewTask = new Intent(MainActivity.this, ViewTask.class);
 
             viewTask.putExtra("row_id", id);
+            viewTask.putExtra("category", currentCategory);
             startActivity(viewTask);
         }
     };

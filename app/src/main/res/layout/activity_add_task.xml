@@ -21,6 +21,19 @@
             android:background="@android:color/darker_gray"/>
 
         <TextView
+            android:text="@string/category_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/category_label"
+            android:paddingTop="10sp"
+            android:paddingBottom="10sp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"/>
+
+        <TextView
             android:text="@string/task_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

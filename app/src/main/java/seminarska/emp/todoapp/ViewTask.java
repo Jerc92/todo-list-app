@@ -24,10 +24,12 @@ public class ViewTask extends AppCompatActivity {
     static final String[] reminderStrings = {"1 hour", "2 hours", "6 hours", "12 hours", "1 day", "2 days", "1 week"};
 
 
+    TextView categoryTextView;
     TextView infoTextView;
     TextView deadlineTextView;
     TextView reminderTextView;
 
+    String categoryData;
     String infoData;
     long deadlineData;
     String reminderData;
@@ -37,6 +39,7 @@ public class ViewTask extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_activity);
 
+        categoryTextView = (TextView) findViewById(R.id.category_label);
         infoTextView = (TextView) findViewById(R.id.info_label);
         deadlineTextView = (TextView) findViewById(R.id.deadline_label);
         reminderTextView = (TextView) findViewById(R.id.reminder_label);
@@ -68,13 +71,17 @@ public class ViewTask extends AppCompatActivity {
 
             result.moveToFirst();
 
+            int categoryIndex = result.getColumnIndex("category");
             int infoIndex = result.getColumnIndex("info");
             int deadlineIndex = result.getColumnIndex("deadline");
             int reminderIndex = result.getColumnIndex("reminders");
 
+            categoryData = result.getString(categoryIndex);
             infoData = result.getString(infoIndex);
             deadlineData = Long.parseLong(result.getString(deadlineIndex));
             reminderData = result.getString(reminderIndex);
+
+            categoryTextView.setText(categoryTextView.getText().toString()+categoryData);
 
             // sets the label for task info on the string from the database
 
@@ -130,6 +137,7 @@ public class ViewTask extends AppCompatActivity {
         Intent editTask = new Intent(ViewTask.this, AddEditTask.class);
 
         editTask.putExtra("row_id", rowID);
+        editTask.putExtra("category", categoryData);
         editTask.putExtra("info", infoData);
         editTask.putExtra("deadline", deadlineData);
         editTask.putExtra("reminders", reminderData);
@@ -145,9 +153,9 @@ public class ViewTask extends AppCompatActivity {
         builder.setTitle("Delete task");
         builder.setMessage("Do you really want to delete this task?");
 
-        builder.setPositiveButton("Yes", deleteListener);
+        builder.setNegativeButton(android.R.string.cancel, null);
 
-        builder.setNegativeButton("No", null);
+        builder.setPositiveButton(android.R.string.ok, deleteListener);
 
         builder.show();
     }

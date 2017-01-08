@@ -32,7 +32,6 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         if (database != null) database.close(); // close the database connection
     }
 
-    // v repeatingDays in reminder se shranijo dnevi/čas v text obliki, ki se pretvori pozneje v Date format
     @Override
     public void onCreate(SQLiteDatabase db) {
         Log.d("DatabaseConnector", "onCreate called");
@@ -40,7 +39,7 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         //daily switch might make more sense for categories than individual tasks
         final String createQueryTasks = "CREATE TABLE tasks" +
                 "(_id integer primary key autoincrement, " +
-                "category INT, " +
+                "category TEXT, " +
                 "info TEXT, " +
                 "reminders TEXT, " +
                 "deadline TEXT);";
@@ -74,7 +73,7 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         return (db.insert("categories", null, contentValues) != -1);
     }
 
-    public void insertTask(int category, String info, String reminders, String deadline) {
+    public void insertTask(String category, String info, String reminders, String deadline) {
         final ContentValues newTask = new ContentValues();
         newTask.put("category", category);
         newTask.put("info", info);
@@ -93,14 +92,14 @@ public class DatabaseConnector extends SQLiteOpenHelper {
 
     public Cursor getTasksByCategory(String category) {
         return database.query("tasks", new String[]{"_id", "info"},
-                            "category="+category, null, null, null, null);
+                            "category='"+category+"'", null, null, null, null);
     }
 
     public Cursor getOneTask(long id) {
         return database.query("tasks", null, "_id="+id, null, null, null, null);
     }
 
-    public void updateTask(long id, int category, String info, String reminders, String deadline) {
+    public void updateTask(long id, String category, String info, String reminders, String deadline) {
         final ContentValues editTask = new ContentValues();
 
         editTask.put("category", category);
