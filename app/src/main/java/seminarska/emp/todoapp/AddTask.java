@@ -1,6 +1,8 @@
 package seminarska.emp.todoapp;
 
 import android.app.Dialog;
+import android.os.AsyncTask;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,12 +14,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 
 public class AddTask extends AppCompatActivity {
 
-    static final String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+    static final long hourInMiliseconds = 3600000;
 
     static final String[] months = {"January", "February", "March", "April", "May", "June", "July",
                                     "August", "September", "October", "November", "December"};
@@ -26,15 +27,15 @@ public class AddTask extends AppCompatActivity {
 
     boolean[] isReminderChecked = {false, false, false, false, false, false, false};
 
-    ArrayList<String> repeatedDays;
+    long rowID;
+
     Calendar deadlineCalendar;
+    String reminderTimes;
 
     EditText info;
-    TextView recurringDays;
     TextView deadlineLabel;
     TextView reminderLabel;
 
-    Dialog weekDays;
     Dialog reminders;
     Dialog datePickerDialog;
     Dialog timePickerDialog;
@@ -50,15 +51,12 @@ public class AddTask extends AppCompatActivity {
         setContentView(R.layout.activity_add_task);
 
         info = (EditText) findViewById(R.id.info_editText);
-        recurringDays = (TextView) findViewById(R.id.repeat_label);
         reminderLabel = (TextView) findViewById(R.id.reminder_label);
         deadlineLabel = (TextView) findViewById(R.id.deadline_label);
 
-        deadlineCalendar = Calendar.getInstance();
+        Bundle extras = getIntent().getExtras();
 
-        weekDays = new Dialog(AddTask.this);
-        weekDays.setContentView(R.layout.checkbox_template);
-        setDaysDialog();
+        deadlineCalendar = Calendar.getInstance();
 
         reminders = new Dialog(AddTask.this);
         reminders.setContentView(R.layout.checkbox_template);
@@ -78,56 +76,8 @@ public class AddTask extends AppCompatActivity {
         // Set minTime to current time, if date == current date
     }
 
-    public void showDays(View view) {
-        weekDays.show();
-    }
-
     public void showReminders(View view) {
         reminders.show();
-    }
-
-    public void confirmDate(View view) {
-        timePickerDialog.show();
-    }
-
-    public void setDaysDialog() {
-        ((CheckBox) weekDays.findViewById(R.id.first_checkbox)).setText(days[0]);
-        ((CheckBox) weekDays.findViewById(R.id.second_checkbox)).setText(days[1]);
-        ((CheckBox) weekDays.findViewById(R.id.third_checkbox)).setText(days[2]);
-        ((CheckBox) weekDays.findViewById(R.id.fourth_checkbox)).setText(days[3]);
-        ((CheckBox) weekDays.findViewById(R.id.fifth_checkbox)).setText(days[4]);
-        ((CheckBox) weekDays.findViewById(R.id.sixth_checkbox)).setText(days[5]);
-        ((CheckBox) weekDays.findViewById(R.id.seventh_checkbox)).setText(days[6]);
-        Button button = (Button) weekDays.findViewById(R.id.checkbox_button);
-        button.setText(getString(R.string.confirm_days));
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                repeatConfirm(v);
-            }
-        });
-    }
-
-    public void repeatConfirm(View view) {
-        repeatedDays = new ArrayList<>();
-        LinearLayout linearLayout = (LinearLayout) weekDays.findViewById(R.id.week_linear);
-        CheckBox checkBox;
-        String temp;
-        StringBuilder recurringDaysText = new StringBuilder();
-        recurringDaysText.append("Recurring days:\n");
-        for (int i = 0; i < 7; i++) {
-            checkBox = (CheckBox) linearLayout.getChildAt(i);
-            if (checkBox.isChecked()) {
-                temp = checkBox.getText().toString();
-                repeatedDays.add(temp);
-                recurringDaysText.append(temp.substring(0, 3)).append(", ");
-            }
-        }
-        recurringDaysText.delete(recurringDaysText.length()-2, recurringDaysText.length()-1);
-
-        recurringDays.setText(recurringDaysText.toString());
-
-        weekDays.dismiss();
     }
 
     public void setReminderDialog() {
@@ -204,5 +154,95 @@ public class AddTask extends AppCompatActivity {
                 datePickerDialog.dismiss();
             }
         });
+    }
+
+    public void confirmDate(View view) {
+        timePickerDialog.show();
+    }
+
+    // Adds the time in miliseconds for all selected reminders to the
+    // string that is used to store in the database
+
+    public void addRemindersToString() {
+        long temp;
+        StringBuilder sb = new StringBuilder();
+        if (isReminderChecked[0]) {
+            temp = deadlineCalendar.getTimeInMillis();
+            temp -= hourInMiliseconds;
+            sb.append(temp).append(",");
+        }
+        if (isReminderChecked[1]) {
+            temp = deadlineCalendar.getTimeInMillis();
+            temp -= hourInMiliseconds *2;
+            sb.append(temp).append(",");
+        }
+        if (isReminderChecked[2]) {
+            temp = deadlineCalendar.getTimeInMillis();
+            temp -= hourInMiliseconds *6;
+            sb.append(temp).append(",");
+        }
+        if (isReminderChecked[3]) {
+            temp = deadlineCalendar.getTimeInMillis();
+            temp -= hourInMiliseconds *12;
+            sb.append(temp).append(",");
+        }
+        if (isReminderChecked[4]) {
+            temp = deadlineCalendar.getTimeInMillis();
+            temp -= hourInMiliseconds *24;
+            sb.append(temp).append(",");
+        }
+        if (isReminderChecked[5]) {
+            temp = deadlineCalendar.getTimeInMillis();
+            temp -= hourInMiliseconds *24*2;
+            sb.append(temp).append(",");
+        }
+        if (isReminderChecked[6]) {
+            temp = deadlineCalendar.getTimeInMillis();
+            temp -= hourInMiliseconds *24*7;
+            sb.append(temp).append(",");
+        }
+        sb.deleteCharAt(sb.length()-1);
+        reminderTimes = sb.toString();
+    }
+
+    public void saveTask(View view) {
+        if (info.getText().length() != 0) {
+            addRemindersToString();
+
+            AsyncTask<Object, Object, Object> saveTaskAsync = new AsyncTask<Object, Object, Object>() {
+                @Override
+                protected Object doInBackground(Object... params) {
+                    saveTaskToDB();
+                    return null;
+                }
+                @Override
+                protected void onPostExecute(Object result) {
+                    finish();
+                }
+            };
+
+            saveTaskAsync.execute((Object[]) null);
+
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(AddTask.this);
+
+            builder.setTitle("Emtpy fields!");
+            builder.setMessage("The task info field can't be emtpy!");
+            builder.setPositiveButton("Ok", null);
+
+            builder.show();
+        }
+    }
+
+    private void saveTaskToDB() {
+        DatabaseConnector db = new DatabaseConnector(this);
+
+        if(getIntent().getExtras() == null) {
+
+            db.insertTask(0, info.getText().toString(), reminderTimes, Long.toString(deadlineCalendar.getTimeInMillis()));
+
+        } else {
+
+        }
     }
 }

@@ -6,8 +6,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.widget.CursorAdapter;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SubMenu;
@@ -23,19 +26,21 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
-    DatabaseConnector db;
-
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     TextView pointsText;
-
     SharedPreferences sharedPreferences;
 
     NavigationView navigationView;
     SubMenu navViewSubMenu;
+
+    ListView taskListView;
+
+    DatabaseConnector db;
+    CursorAdapter taskAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +54,15 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         toggle.syncState();
 
+        taskListView = (ListView) findViewById(R.id.task_list);
+        //taskListView.setOnItemClickListener();
+
         //onUpgrade called every launch to truncate db for easier debugging
         //CHANGE WHEN APP IS FINISHED
         db = new DatabaseConnector(this);
         db.onUpgrade(db.getWritableDatabase(), 1, 2);
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         //navigation views submenu needed to be populated from db in populateNavMenu method
         navViewSubMenu = navigationView.getMenu().findItem(R.id.categoriesSubMenu).getSubMenu();
@@ -78,7 +86,25 @@ public class MainActivity extends AppCompatActivity
         pointsText = (TextView) headerView.findViewById(R.id.points);
 
         pointsText.setText(sharedPreferences.getInt("points", 0)+"");
+
+        taskAdapter = new SimpleCursorAdapter(this, R.layout.task_list_item, null, new String[]{"info"}, new int[]{R.id.listView_item}, 0);
+
+        taskListView.setAdapter(taskAdapter);
     }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        new GetTasks().execute();
+    }
+
+    @Override
+    public void onStop() {
+        taskAdapter.changeCursor(null);
+        super.onStop();
+    }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -109,6 +135,20 @@ public class MainActivity extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private class GetTasks extends AsyncTask<Object, Object, Cursor> {
+        @Override
+        protected Cursor doInBackground(Object... params) {
+            db.open();
+            return db.getAllTasks();
+        }
+
+        @Override
+        protected void onPostExecute(Cursor result){
+            taskAdapter.changeCursor(result);
+            db.close();
+        }
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

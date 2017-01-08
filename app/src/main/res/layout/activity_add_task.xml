@@ -41,22 +41,6 @@
             android:background="@android:color/darker_gray"/>
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/repeat_label"
-            android:onClick="showDays"
-            android:text="@string/repeat_label"
-            android:textSize="14sp"
-            android:paddingTop="10sp"
-            android:paddingBottom="10sp"
-            android:lineSpacingExtra="8sp" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@android:color/darker_gray"/>
-
-        <TextView
             android:text="@string/deadline_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -88,4 +72,13 @@
             android:background="@android:color/darker_gray"/>
 
     </LinearLayout>
+
+    <Button
+        android:text="@string/create_task_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/create_task_button"
+        android:layout_alignParentBottom="true"
+        android:onClick="saveTask"/>
+
 </RelativeLayout>

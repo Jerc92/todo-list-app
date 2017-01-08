@@ -73,6 +73,23 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         return (db.insert("categories", null, contentValues) != -1);
     }
 
+    public void insertTask(int category, String info, String reminders, String deadline) {
+        final ContentValues newTask = new ContentValues();
+        newTask.put("category", category);
+        newTask.put("info", info);
+        newTask.put("reminders", reminders);
+        newTask.put("deadline", deadline);
+
+        open();
+        database.insert("tasks", null, newTask);
+        close();
+    }
+
+    public Cursor getAllTasks() {
+        return database.query("tasks", new String[]{"_id", "info", "category"},
+                            null, null, null, null, "_id");
+    }
+
     public Cursor getCategories() {
         //getting writable database everytime might not be the best idea..
         database = getWritableDatabase();
