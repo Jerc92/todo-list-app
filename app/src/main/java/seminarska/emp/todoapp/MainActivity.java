@@ -128,6 +128,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        //hide or show categoryDelete menuItem if All category is selected or not
+        menu.findItem(R.id.action_categoryDelete).setVisible((currentCategory != "others"));
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -137,6 +144,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.action_categoryDelete) {
+            navViewSubMenu.removeItem(db.getCategoryID(currentCategory));
+            db.deleteCategory(currentCategory);
+            currentCategory = "others";
         }
 
         return super.onOptionsItemSelected(item);
@@ -165,10 +176,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
         //dynamic category item clicks could be handled by item.getTitle()
-        Toast.makeText(getApplicationContext(), item.getTitle(), Toast.LENGTH_SHORT).show();
-
         if (id == R.id.nav_rewards) {
 
         } else if (id == R.id.nav_all) {
@@ -225,20 +233,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void populateNavMenu(SubMenu navViewSubMenu) {
-        //added first is the all category, should always have id of 0
+        //gets categories from db, calls addNavMenuItem() for each of them
         Cursor categories = db.getCategories();
         categories.moveToFirst();
-        Log.d("ActivityMain", String.valueOf(categories.getCount()));
-        for (int i = 1; i <= categories.getCount(); i++) {
-            //create menu entries from categories cursor data
+        do {
             addNavMenuItem(navViewSubMenu, categories.getString(0));
-            categories.moveToNext();
-        }
+        } while (categories.moveToNext());
+        //set All to checked for startup
+        navigationView.setCheckedItem(navViewSubMenu.findItem(R.id.nav_all).getItemId());
         categories.close();
     }
     public void addNavMenuItem(SubMenu navViewSubMenu, String name) {
+        //adds items to NavMenu and sets onLongClickListeners for them
         navViewSubMenu.add(R.id.categoriesGroup, db.getCategoryID(name),
-                Menu.NONE, name).setIcon(R.drawable.ic_label_outline_black_24dp);
+                Menu.NONE, name).setIcon(R.drawable.ic_label_outline_black_24dp).setCheckable(true);
     }
 
     AdapterView.OnItemClickListener viewTaskListener = new AdapterView.OnItemClickListener() {

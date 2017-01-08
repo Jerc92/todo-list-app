@@ -62,17 +62,6 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean addCategory(String name, boolean daily) {
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        int isDaily = (daily) ? 1 : 0;
-        contentValues.put("category", name);
-        contentValues.put("daily", isDaily);
-
-        //checking success or failure of function call, insert returns -1 on failure
-        return (db.insert("categories", null, contentValues) != -1);
-    }
-
     public void insertTask(String category, String info, String reminders, String deadline) {
         final ContentValues newTask = new ContentValues();
         newTask.put("category", category);
@@ -115,6 +104,23 @@ public class DatabaseConnector extends SQLiteOpenHelper {
     public void deleteTask(long id) {
         open();
         database.delete("tasks", "_id="+id, null);
+        close();
+    }
+
+    public boolean addCategory(String name, boolean daily) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        int isDaily = (daily) ? 1 : 0;
+        contentValues.put("category", name);
+        contentValues.put("daily", isDaily);
+
+        //checking success or failure of function call, insert returns -1 on failure
+        return (db.insert("categories", null, contentValues) != -1);
+    }
+
+    public void deleteCategory(String category) {
+        open();
+        database.delete("categories", "category='"+ category +"'", null);
         close();
     }
 
