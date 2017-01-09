@@ -26,6 +26,7 @@ import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ListView taskListView;
 
     DatabaseConnector db;
-    CursorAdapter taskAdapter;
+    customAdapter taskAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,8 +92,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         pointsText = (TextView) headerView.findViewById(R.id.points);
 
         pointsText.setText(sharedPreferences.getInt("points", 0)+"");
-
-        taskAdapter = new SimpleCursorAdapter(this, R.layout.task_list_item, null, new String[]{"info"}, new int[]{R.id.listView_item}, 0);
+        //this, R.layout.task_list_item, null, new String[]{"info"}, new int[]{R.id.listView_item}, 0
+        taskAdapter = new customAdapter(this, R.layout.task_list_item, null, new String[]{"info"}, new int[]{R.id.listView_item}, 0,  db);
 
         taskListView.setAdapter(taskAdapter);
     }
@@ -129,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        //hide or show categoryDelete menuItem if All category is selected or not
+        //hide or show categoryDelete menuItem depending if current category is all
         menu.findItem(R.id.action_categoryDelete).setVisible((currentCategory != "others"));
         return true;
     }
@@ -248,7 +249,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navViewSubMenu.add(R.id.categoriesGroup, db.getCategoryID(name),
                 Menu.NONE, name).setIcon(R.drawable.ic_label_outline_black_24dp).setCheckable(true);
     }
-
     AdapterView.OnItemClickListener viewTaskListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

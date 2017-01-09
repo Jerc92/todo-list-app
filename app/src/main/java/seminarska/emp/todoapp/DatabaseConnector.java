@@ -27,7 +27,6 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         database = this.getWritableDatabase();
     }
 
-
     public void close() {
         if (database != null) database.close(); // close the database connection
     }
@@ -105,6 +104,12 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         open();
         database.delete("tasks", "_id="+id, null);
         close();
+    }
+    public int getTaskID(String name) {
+        database = getWritableDatabase();
+        Cursor c = database.rawQuery("SELECT _id FROM tasks WHERE info = '" + name +"'", null);
+        c.moveToFirst();
+        return c.getInt(0);
     }
 
     public boolean addCategory(String name, boolean daily) {
