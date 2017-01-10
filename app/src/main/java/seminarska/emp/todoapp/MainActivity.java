@@ -69,8 +69,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //onUpgrade called every launch to truncate db for easier debugging
         //CHANGE WHEN APP IS FINISHED
-        db = new DatabaseConnector(this);
-        db.onUpgrade(db.getWritableDatabase(), 1, 2);
+        //db = new DatabaseConnector(this);
+        //db.onUpgrade(db.getWritableDatabase(), 1, 2);
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
