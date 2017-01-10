@@ -1,7 +1,11 @@
 package seminarska.emp.todoapp;
 
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -42,6 +46,8 @@ public class AddEditTask extends AppCompatActivity {
     String category = "others";
     int points;
 
+    SharedPreferences sharedPreferences;
+
     TextView categoryTextView;
     EditText infoEditText;
     TextView deadlineTextView;
@@ -70,6 +76,8 @@ public class AddEditTask extends AppCompatActivity {
         pointsSpinner = (Spinner) findViewById(R.id.points_spinner);
 
         deadlineCalendar = Calendar.getInstance();
+
+        sharedPreferences = getSharedPreferences("notifications", Context.MODE_PRIVATE);
 
         reminderDialog = new Dialog(AddEditTask.this);
         reminderDialog.setContentView(R.layout.checkbox_template);
@@ -200,6 +208,7 @@ public class AddEditTask extends AppCompatActivity {
 
     public void addRemindersToString() {
         // adds the time in miliseconds as well as the index of that reminder for later use
+        // add the pendingintent id instead of the time and set the pendingintent
 
         long temp;
         StringBuilder sb = new StringBuilder();
@@ -302,7 +311,8 @@ public class AddEditTask extends AppCompatActivity {
 
     public void saveTask(View view) {
         if (infoEditText.getText().length() != 0) {
-            addRemindersToString();
+
+            if(reminderTimes.length() != 0) addRemindersToString();
 
             AsyncTask<Object, Object, Object> saveTaskAsync = new AsyncTask<Object, Object, Object>() {
                 @Override
@@ -315,6 +325,14 @@ public class AddEditTask extends AppCompatActivity {
                     finish();
                 }
             };
+
+            Intent intent = new Intent(this, ViewTask.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 1222, intent, PendingIntent.FLAG_UPDATE_CURRENT | Intent.FILL_IN_DATA);
+
+            AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
+            manager.set(AlarmManager.RTC_WAKEUP, deadlineCalendar.getTimeInMillis(), pendingIntent);
+
+            Toast.makeText(this, "Alarm set", Toast.LENGTH_SHORT).show();
 
             saveTaskAsync.execute((Object[]) null);
 

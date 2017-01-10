@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         //hide or show categoryDelete menuItem depending if current category is all
-        menu.findItem(R.id.action_categoryDelete).setVisible((currentCategory != "others"));
+        menu.findItem(R.id.action_categoryDelete).setVisible(!currentCategory.equals("others"));
         return true;
     }
 
@@ -258,18 +258,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         @Override
-        public void onDrawerOpened(View drawerView) {
-
-        }
+        public void onDrawerOpened(View drawerView) {}
 
         @Override
-        public void onDrawerClosed(View drawerView) {
-
-        }
+        public void onDrawerClosed(View drawerView) {}
 
         @Override
-        public void onDrawerStateChanged(int newState) {
-
-        }
+        public void onDrawerStateChanged(int newState) {}
     };
 }

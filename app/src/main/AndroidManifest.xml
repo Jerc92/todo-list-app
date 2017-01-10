@@ -20,6 +20,7 @@
         </activity>
         <activity android:name=".AddEditTask" />
         <activity android:name=".ViewTask"></activity>
+        <receiver  android:name=".TaskNotification"></receiver>
     </application>
 
 </manifest>
