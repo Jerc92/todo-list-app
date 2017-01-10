@@ -211,44 +211,98 @@ public class AddEditTask extends AppCompatActivity {
         // add the pendingintent id instead of the time and set the pendingintent
 
         long temp;
+
         StringBuilder sb = new StringBuilder();
         if (isReminderChecked[0]) {
             temp = deadlineCalendar.getTimeInMillis();
             temp -= hourInMiliseconds;
-            sb.append(temp).append(":").append(0).append(",");
+            int code = sharedPreferences.getInt("notifications", 0);
+            createReminder(code, temp, 0);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("notifications", sharedPreferences.getInt("notifications", 0)+1);
+            editor.apply();
+            sb.append(code).append(":").append(0).append(",");
         }
         if (isReminderChecked[1]) {
             temp = deadlineCalendar.getTimeInMillis();
             temp -= hourInMiliseconds *2;
-            sb.append(temp).append(":").append(1).append(",");
+            int code = sharedPreferences.getInt("notifications", 0);
+            createReminder(code, temp, 1);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("notifications", sharedPreferences.getInt("notifications", 0)+1);
+            editor.apply();
+            sb.append(code).append(":").append(1).append(",");
         }
         if (isReminderChecked[2]) {
             temp = deadlineCalendar.getTimeInMillis();
             temp -= hourInMiliseconds *6;
-            sb.append(temp).append(":").append(2).append(",");
+            int code = sharedPreferences.getInt("notifications", 0);
+            createReminder(code, temp, 2);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("notifications", sharedPreferences.getInt("notifications", 0)+1);
+            editor.apply();
+            sb.append(code).append(":").append(2).append(",");
         }
         if (isReminderChecked[3]) {
             temp = deadlineCalendar.getTimeInMillis();
             temp -= hourInMiliseconds *12;
-            sb.append(temp).append(":").append(3).append(",");
+            int code = sharedPreferences.getInt("notifications", 0);
+            createReminder(code, temp, 3);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("notifications", sharedPreferences.getInt("notifications", 0)+1);
+            editor.apply();
+            sb.append(code).append(":").append(3).append(",");
         }
         if (isReminderChecked[4]) {
             temp = deadlineCalendar.getTimeInMillis();
             temp -= hourInMiliseconds *24;
-            sb.append(temp).append(":").append(4).append(",");
+            int code = sharedPreferences.getInt("notifications", 0);
+            createReminder(code, temp, 4);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("notifications", sharedPreferences.getInt("notifications", 0)+1);
+            editor.apply();
+            sb.append(code).append(":").append(4).append(",");
         }
         if (isReminderChecked[5]) {
             temp = deadlineCalendar.getTimeInMillis();
             temp -= hourInMiliseconds *24*2;
-            sb.append(temp).append(":").append(5).append(",");
+            int code = sharedPreferences.getInt("notifications", 0);
+            createReminder(code, temp, 5);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("notifications", sharedPreferences.getInt("notifications", 0)+1);
+            editor.apply();
+            sb.append(code).append(":").append(5).append(",");
         }
         if (isReminderChecked[6]) {
             temp = deadlineCalendar.getTimeInMillis();
             temp -= hourInMiliseconds *24*7;
-            sb.append(temp).append(":").append(6).append(",");
+            int code = sharedPreferences.getInt("notifications", 0);
+            createReminder(code, temp, 6);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("notifications", sharedPreferences.getInt("notifications", 0)+1);
+            editor.apply();
+            sb.append(code).append(":").append(6).append(",");
         }
         sb.deleteCharAt(sb.length()-1);
         reminderTimes = sb.toString();
+    }
+
+    public void createReminder(int code, long time, int stringIndex) {
+        Intent intent = new Intent(this, TaskNotification.class);
+        intent.putExtra("reminderTime", reminderStrings[stringIndex]);
+        intent.putExtra("taskInfo", infoEditText.getText().toString());
+        intent.putExtra("category", category);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), code, intent, PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        manager.set(AlarmManager.RTC, time, pendingIntent);
+    }
+
+    public void cancelReminder(int code) {
+        Intent intent = new Intent(this, TaskNotification.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), code, intent, PendingIntent.FLAG_NO_CREATE);
+        if (pendingIntent != null) {
+            pendingIntent.cancel();
+        }
     }
 
     public void handleExistingTask(Bundle extras) {
@@ -287,6 +341,7 @@ public class AddEditTask extends AppCompatActivity {
 
         for (int i = 0; i < reminderArray.length; i++) {
             int currentIndex = Integer.parseInt(reminderArray[i].split(":")[1]);
+            cancelReminder(Integer.parseInt(reminderArray[i].split(":")[0]));
             stringBuilder.append(reminderStrings[currentIndex]).append(", ");
             isReminderChecked[currentIndex] = true;
         }
@@ -312,7 +367,7 @@ public class AddEditTask extends AppCompatActivity {
     public void saveTask(View view) {
         if (infoEditText.getText().length() != 0) {
 
-            if(reminderTimes.length() != 0) addRemindersToString();
+            addRemindersToString();
 
             AsyncTask<Object, Object, Object> saveTaskAsync = new AsyncTask<Object, Object, Object>() {
                 @Override
@@ -325,14 +380,6 @@ public class AddEditTask extends AppCompatActivity {
                     finish();
                 }
             };
-
-            Intent intent = new Intent(this, ViewTask.class);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 1222, intent, PendingIntent.FLAG_UPDATE_CURRENT | Intent.FILL_IN_DATA);
-
-            AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
-            manager.set(AlarmManager.RTC_WAKEUP, deadlineCalendar.getTimeInMillis(), pendingIntent);
-
-            Toast.makeText(this, "Alarm set", Toast.LENGTH_SHORT).show();
 
             saveTaskAsync.execute((Object[]) null);
 

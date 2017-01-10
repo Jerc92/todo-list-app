@@ -1,7 +1,9 @@
 package seminarska.emp.todoapp;
 
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -18,9 +20,11 @@ public class DatabaseConnector extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     private SQLiteDatabase database;
+    private Context context;
 
     public DatabaseConnector(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
     }
 
     public void open() throws SQLException {
@@ -105,6 +109,14 @@ public class DatabaseConnector extends SQLiteOpenHelper {
 
     public void deleteTask(long id) {
         open();
+        Cursor task = database.query("tasks", null, "_id="+id, null, null, null, null);
+        task.moveToFirst();
+        int reminderIndex = task.getColumnIndex("reminders");
+        String[] reminderData = task.getString(reminderIndex).split(",");
+        for (int i = 0; i < reminderData.length; i++) {
+            cancelReminder(Integer.parseInt(reminderData[i].split(":")[0]));
+        }
+
         database.delete("tasks", "_id="+id, null);
         close();
     }
@@ -158,5 +170,13 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         db.execSQL(insertQuery);
         db.execSQL(insertQuery2);
         db.execSQL(insertQuery3);
+    }
+
+    public void cancelReminder(int code) {
+        Intent intent = new Intent(context, TaskNotification.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, code, intent, PendingIntent.FLAG_NO_CREATE);
+        if (pendingIntent != null) {
+            pendingIntent.cancel();
+        }
     }
 }

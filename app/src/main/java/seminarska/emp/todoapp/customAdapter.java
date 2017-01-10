@@ -45,7 +45,6 @@ public class customAdapter extends SimpleCursorAdapter {
                                 inView.setAlpha(1);
                             }
                         });
-                Log.d("za foro!!!!", String.valueOf(database.getTaskID((String) tView.getText())));
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override

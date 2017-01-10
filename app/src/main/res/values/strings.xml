@@ -26,6 +26,7 @@
     <string name="rewards">Rewards</string>
     <string name="new_category">New category</string>
     <string name="delete_category">Delete category</string>
+    <string name="notification_title">Task is due soon!</string>
 
     <string-array name="points_list">
         <item>100</item>
