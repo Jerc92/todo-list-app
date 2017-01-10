@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     TextView pointsText;
     SharedPreferences sharedPreferences;
     String currentCategory = "others";
+    int currentIsRepeatable = 0;
 
     NavigationView navigationView;
     SubMenu navViewSubMenu;
@@ -173,11 +174,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         } else if (id == R.id.nav_all) {
             currentCategory = "others";
+            currentIsRepeatable = db.getCategoryIsRepeatable(currentCategory);
             new GetTasks().execute(currentCategory);
         } else if (id == R.id.nav_addNew) {
             addCategoryPrompt();
         } else {
             currentCategory = item.getTitle().toString();
+            currentIsRepeatable = db.getCategoryIsRepeatable(currentCategory);
             new GetTasks().execute(currentCategory);
         }
 
@@ -191,6 +194,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (!currentCategory.equals("others")) {
             intent.putExtra("category", currentCategory);
         }
+        intent.putExtra("isRepeatable", currentIsRepeatable);
         startActivity(intent);
     }
 
@@ -247,6 +251,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             viewTask.putExtra("row_id", id);
             viewTask.putExtra("category", currentCategory);
+            viewTask.putExtra("isRepeatable", currentIsRepeatable);
             startActivity(viewTask);
         }
     };

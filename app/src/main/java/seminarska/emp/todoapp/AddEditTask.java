@@ -41,6 +41,7 @@ public class AddEditTask extends AppCompatActivity {
 
     long rowID;
 
+
     Calendar deadlineCalendar;
     String reminderTimes;
     String category = "others";
@@ -110,6 +111,10 @@ public class AddEditTask extends AppCompatActivity {
             if(extras.containsKey("category")) {
                 categoryTextView.setText(categoryTextView.getText().toString()+extras.getString("category"));
                 category = extras.getString("category");
+            }
+            if(extras.getInt("isRepeatable") == 1) {
+                reminderTextView.setVisibility(View.GONE);
+                deadlineTextView.setVisibility(View.GONE);
             }
             if (extras.containsKey("row_id")) {
                 handleExistingTask(extras);
@@ -283,11 +288,16 @@ public class AddEditTask extends AppCompatActivity {
             editor.apply();
             sb.append(code).append(":").append(6).append(",");
         }
-        sb.deleteCharAt(sb.length()-1);
+        if(sb.length() != 0) {
+            sb.deleteCharAt(sb.length()-1);
+        }
         reminderTimes = sb.toString();
     }
 
     public void createReminder(int code, long time, int stringIndex) {
+        if (time < Calendar.getInstance().getTimeInMillis()) {
+            return;
+        }
         Intent intent = new Intent(this, TaskNotification.class);
         intent.putExtra("reminderTime", reminderStrings[stringIndex]);
         intent.putExtra("taskInfo", infoEditText.getText().toString());
@@ -310,53 +320,55 @@ public class AddEditTask extends AppCompatActivity {
 
         infoEditText.setText(infoEditText.getText().toString()+extras.getString("info"));
 
-        deadlineCalendar.setTimeInMillis(extras.getLong("deadline"));
+        if(extras.getInt("isRepeatable") == 0) {
+            deadlineCalendar.setTimeInMillis(extras.getLong("deadline"));
 
-        StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append(deadlineTextView.getText().toString());
+            stringBuilder.append(deadlineTextView.getText().toString());
 
-        String dateString = deadlineCalendar.get(Calendar.DAY_OF_MONTH)+". "
-                +months[deadlineCalendar.get(Calendar.MONTH)]+" "+ deadlineCalendar.get(Calendar.YEAR);
-        String hourString;
-        if(deadlineCalendar.get(Calendar.MINUTE) < 10) {
-            hourString = deadlineCalendar.get(Calendar.HOUR_OF_DAY)+":0"+deadlineCalendar.get(Calendar.MINUTE);
-        } else {
-            hourString = deadlineCalendar.get(Calendar.HOUR_OF_DAY)+":"+deadlineCalendar.get(Calendar.MINUTE);
-        }
+            String dateString = deadlineCalendar.get(Calendar.DAY_OF_MONTH)+". "
+                    +months[deadlineCalendar.get(Calendar.MONTH)]+" "+ deadlineCalendar.get(Calendar.YEAR);
+            String hourString;
+            if(deadlineCalendar.get(Calendar.MINUTE) < 10) {
+                hourString = deadlineCalendar.get(Calendar.HOUR_OF_DAY)+":0"+deadlineCalendar.get(Calendar.MINUTE);
+            } else {
+                hourString = deadlineCalendar.get(Calendar.HOUR_OF_DAY)+":"+deadlineCalendar.get(Calendar.MINUTE);
+            }
 
-        stringBuilder.append(dateString).append(", ").append(hourString);
+            stringBuilder.append(dateString).append(", ").append(hourString);
 
-        deadlineTextView.setText(stringBuilder.toString());
+            deadlineTextView.setText(stringBuilder.toString());
 
-        datePicker.updateDate(deadlineCalendar.get(Calendar.YEAR), deadlineCalendar.get(Calendar.MONTH), deadlineCalendar.get(Calendar.DAY_OF_MONTH));
-        timePicker.setMinute(deadlineCalendar.get(Calendar.MINUTE));
-        timePicker.setHour(deadlineCalendar.get(Calendar.HOUR_OF_DAY));
+            datePicker.updateDate(deadlineCalendar.get(Calendar.YEAR), deadlineCalendar.get(Calendar.MONTH), deadlineCalendar.get(Calendar.DAY_OF_MONTH));
+            timePicker.setMinute(deadlineCalendar.get(Calendar.MINUTE));
+            timePicker.setHour(deadlineCalendar.get(Calendar.HOUR_OF_DAY));
 
-        String[] reminderArray = extras.getString("reminders").split(",");
+            String[] reminderArray = extras.getString("reminders").split(",");
 
-        stringBuilder.delete(0, stringBuilder.length());
+            stringBuilder.delete(0, stringBuilder.length());
 
-        stringBuilder.append(reminderTextView.getText().toString());
+            stringBuilder.append(reminderTextView.getText().toString());
 
-        for (int i = 0; i < reminderArray.length; i++) {
-            int currentIndex = Integer.parseInt(reminderArray[i].split(":")[1]);
-            cancelReminder(Integer.parseInt(reminderArray[i].split(":")[0]));
-            stringBuilder.append(reminderStrings[currentIndex]).append(", ");
-            isReminderChecked[currentIndex] = true;
-        }
+            for (int i = 0; i < reminderArray.length; i++) {
+                int currentIndex = Integer.parseInt(reminderArray[i].split(":")[1]);
+                cancelReminder(Integer.parseInt(reminderArray[i].split(":")[0]));
+                stringBuilder.append(reminderStrings[currentIndex]).append(", ");
+                isReminderChecked[currentIndex] = true;
+            }
 
-        stringBuilder.delete(stringBuilder.length()-2, stringBuilder.length()-1);
+            stringBuilder.delete(stringBuilder.length()-2, stringBuilder.length()-1);
 
-        reminderTextView.setText(stringBuilder.toString());
+            reminderTextView.setText(stringBuilder.toString());
 
-        LinearLayout linearLayout = (LinearLayout) reminderDialog.findViewById(R.id.week_linear);
-        CheckBox checkBox;
+            LinearLayout linearLayout = (LinearLayout) reminderDialog.findViewById(R.id.week_linear);
+            CheckBox checkBox;
 
-        for (int i = 0; i < isReminderChecked.length; i++) {
-            if (isReminderChecked[i]) {
-                checkBox = (CheckBox) linearLayout.getChildAt(i);
-                checkBox.setChecked(true);
+            for (int i = 0; i < isReminderChecked.length; i++) {
+                if (isReminderChecked[i]) {
+                    checkBox = (CheckBox) linearLayout.getChildAt(i);
+                    checkBox.setChecked(true);
+                }
             }
         }
 

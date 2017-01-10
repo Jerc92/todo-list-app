@@ -109,14 +109,6 @@ public class DatabaseConnector extends SQLiteOpenHelper {
 
     public void deleteTask(long id) {
         open();
-        Cursor task = database.query("tasks", null, "_id="+id, null, null, null, null);
-        task.moveToFirst();
-        int reminderIndex = task.getColumnIndex("reminders");
-        String[] reminderData = task.getString(reminderIndex).split(",");
-        for (int i = 0; i < reminderData.length; i++) {
-            cancelReminder(Integer.parseInt(reminderData[i].split(":")[0]));
-        }
-
         database.delete("tasks", "_id="+id, null);
         close();
     }
@@ -143,6 +135,7 @@ public class DatabaseConnector extends SQLiteOpenHelper {
     public void deleteCategory(String category) {
         open();
         database.delete("categories", "category='"+ category +"'", null);
+        database.delete("tasks", "category='"+category+"'", null);
         close();
     }
 
@@ -159,6 +152,13 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         return c.getInt(0);
     }
 
+    public int getCategoryIsRepeatable(String name) {
+        database = getWritableDatabase();
+        Cursor c = database.query("categories", null, "category='"+name+"'", null, null, null, null);
+        c.moveToFirst();
+        return c.getInt(c.getColumnIndex("daily"));
+    }
+
     private void insertDefaultData(SQLiteDatabase db) {
         //temporary way to add default categories
         //CHANGE WHEN APP IS FINISHED
@@ -170,13 +170,5 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         db.execSQL(insertQuery);
         db.execSQL(insertQuery2);
         db.execSQL(insertQuery3);
-    }
-
-    public void cancelReminder(int code) {
-        Intent intent = new Intent(context, TaskNotification.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, code, intent, PendingIntent.FLAG_NO_CREATE);
-        if (pendingIntent != null) {
-            pendingIntent.cancel();
-        }
     }
 }

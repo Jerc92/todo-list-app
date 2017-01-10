@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -30,6 +31,7 @@ public class ViewTask extends AppCompatActivity {
     TextView reminderTextView;
     TextView pointsTextView;
 
+    int isRepeatable;
     String categoryData;
     String infoData;
     long deadlineData;
@@ -50,6 +52,7 @@ public class ViewTask extends AppCompatActivity {
         final Bundle extras = getIntent().getExtras();
 
         rowID = extras.getLong("row_id");
+        isRepeatable = extras.getInt("isRepeatable");
     }
 
     @Override
@@ -96,44 +99,51 @@ public class ViewTask extends AppCompatActivity {
 
             // transforms the string from the db into a Calendar class and sets the deadline label to the proper format
 
-            Calendar deadlineCalendar = Calendar.getInstance();
-            deadlineCalendar.setTimeInMillis(deadlineData);
+            if(isRepeatable == 0) {
+                Calendar deadlineCalendar = Calendar.getInstance();
+                deadlineCalendar.setTimeInMillis(deadlineData);
 
-            StringBuilder stringBuilder = new StringBuilder();
+                StringBuilder stringBuilder = new StringBuilder();
 
-            stringBuilder.append(deadlineTextView.getText().toString());
+                stringBuilder.append(deadlineTextView.getText().toString());
 
-            String dateString = deadlineCalendar.get(Calendar.DAY_OF_MONTH)+". "
-                                +months[deadlineCalendar.get(Calendar.MONTH)]+" "+ deadlineCalendar.get(Calendar.YEAR);
-            String hourString;
-            if(deadlineCalendar.get(Calendar.MINUTE) < 10) {
-                hourString = deadlineCalendar.get(Calendar.HOUR_OF_DAY)+":0"+deadlineCalendar.get(Calendar.MINUTE);
+                String dateString = deadlineCalendar.get(Calendar.DAY_OF_MONTH)+". "
+                        +months[deadlineCalendar.get(Calendar.MONTH)]+" "+ deadlineCalendar.get(Calendar.YEAR);
+                String hourString;
+                if(deadlineCalendar.get(Calendar.MINUTE) < 10) {
+                    hourString = deadlineCalendar.get(Calendar.HOUR_OF_DAY)+":0"+deadlineCalendar.get(Calendar.MINUTE);
+                } else {
+                    hourString = deadlineCalendar.get(Calendar.HOUR_OF_DAY)+":"+deadlineCalendar.get(Calendar.MINUTE);
+                }
+
+                stringBuilder.append(dateString).append(", ").append(hourString);
+
+                deadlineTextView.setText(stringBuilder.toString());
+
+
+
+                // converts the reminder data from the delimiters, it's used to fix the reminder label
+
+                String[] reminderArray = reminderData.split(",");
+
+                Log.d("dasdsa", reminderData);
+
+                stringBuilder.delete(0, stringBuilder.length());
+
+                stringBuilder.append(reminderTextView.getText().toString());
+
+                for (int i = 0; i < reminderArray.length; i++) {
+                    int currentIndex = Integer.parseInt(reminderArray[i].split(":")[1]);
+                    stringBuilder.append(reminderStrings[currentIndex]).append(", ");
+                }
+
+                stringBuilder.delete(stringBuilder.length()-2, stringBuilder.length()-1);
+
+                reminderTextView.setText(stringBuilder.toString());
             } else {
-                hourString = deadlineCalendar.get(Calendar.HOUR_OF_DAY)+":"+deadlineCalendar.get(Calendar.MINUTE);
+                deadlineTextView.setVisibility(View.GONE);
+                reminderTextView.setVisibility(View.GONE);
             }
-
-            stringBuilder.append(dateString).append(", ").append(hourString);
-
-            deadlineTextView.setText(stringBuilder.toString());
-
-
-
-            // converts the reminder data from the delimiters, it's used to fix the reminder label
-
-            String[] reminderArray = reminderData.split(",");
-
-            stringBuilder.delete(0, stringBuilder.length());
-
-            stringBuilder.append(reminderTextView.getText().toString());
-
-            for (int i = 0; i < reminderArray.length; i++) {
-                int currentIndex = Integer.parseInt(reminderArray[i].split(":")[1]);
-                stringBuilder.append(reminderStrings[currentIndex]).append(", ");
-            }
-
-            stringBuilder.delete(stringBuilder.length()-2, stringBuilder.length()-1);
-
-            reminderTextView.setText(stringBuilder.toString());
 
             result.close();
             db.close();
@@ -149,6 +159,7 @@ public class ViewTask extends AppCompatActivity {
         editTask.putExtra("deadline", deadlineData);
         editTask.putExtra("reminders", reminderData);
         editTask.putExtra("points", pointsData);
+        editTask.putExtra("isRepeatable", isRepeatable);
 
         startActivity(editTask);
 
