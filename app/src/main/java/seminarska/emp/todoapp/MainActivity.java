@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     NavigationView navigationView;
     SubMenu navViewSubMenu;
+    DrawerLayout drawer;
+
 
     ListView taskListView;
 
@@ -55,10 +57,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         toggle.syncState();
+        drawer.addDrawerListener(changePoints);
 
         taskListView = (ListView) findViewById(R.id.task_list);
         taskListView.setOnItemClickListener(viewTaskListener);
@@ -75,17 +78,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         populateNavMenu(navViewSubMenu);
 
         sharedPreferences = getSharedPreferences("points", Context.MODE_PRIVATE);
-
-        SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                if (key.equals("points")) {
-                    pointsText.setText(sharedPreferences.getInt(key, 0)+"");
-                }
-            }
-        };
-
-        sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
 
         View headerView = navigationView.getHeaderView(0);
 
@@ -113,7 +105,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -257,6 +248,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             viewTask.putExtra("row_id", id);
             viewTask.putExtra("category", currentCategory);
             startActivity(viewTask);
+        }
+    };
+
+    DrawerLayout.DrawerListener changePoints = new DrawerLayout.DrawerListener() {
+        @Override
+        public void onDrawerSlide(View drawerView, float slideOffset) {
+            pointsText.setText(sharedPreferences.getInt("points", 0)+"");
+        }
+
+        @Override
+        public void onDrawerOpened(View drawerView) {
+
+        }
+
+        @Override
+        public void onDrawerClosed(View drawerView) {
+
+        }
+
+        @Override
+        public void onDrawerStateChanged(int newState) {
+
         }
     };
 }

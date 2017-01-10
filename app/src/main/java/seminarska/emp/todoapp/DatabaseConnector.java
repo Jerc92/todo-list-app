@@ -108,6 +108,8 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         database.delete("tasks", "_id="+id, null);
         close();
     }
+
+
     public int getTaskID(String name) {
         database = getWritableDatabase();
         Cursor c = database.rawQuery("SELECT _id FROM tasks WHERE info = '" + name +"'", null);
