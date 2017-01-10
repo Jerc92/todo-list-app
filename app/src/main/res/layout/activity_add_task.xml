@@ -83,6 +83,26 @@
             android:layout_height="1dp"
             android:background="@android:color/darker_gray"/>
 
+
+        <TextView
+            android:text="@string/points_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10sp"
+            android:id="@+id/points_label" />
+
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10sp"
+            android:id="@+id/points_spinner" />
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"/>
+
     </LinearLayout>
 
     <Button

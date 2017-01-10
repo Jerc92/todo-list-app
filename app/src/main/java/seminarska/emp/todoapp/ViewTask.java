@@ -28,11 +28,13 @@ public class ViewTask extends AppCompatActivity {
     TextView infoTextView;
     TextView deadlineTextView;
     TextView reminderTextView;
+    TextView pointsTextView;
 
     String categoryData;
     String infoData;
     long deadlineData;
     String reminderData;
+    int pointsData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +45,7 @@ public class ViewTask extends AppCompatActivity {
         infoTextView = (TextView) findViewById(R.id.info_label);
         deadlineTextView = (TextView) findViewById(R.id.deadline_label);
         reminderTextView = (TextView) findViewById(R.id.reminder_label);
+        pointsTextView = (TextView) findViewById(R.id.points_label);
 
         final Bundle extras = getIntent().getExtras();
 
@@ -75,11 +78,15 @@ public class ViewTask extends AppCompatActivity {
             int infoIndex = result.getColumnIndex("info");
             int deadlineIndex = result.getColumnIndex("deadline");
             int reminderIndex = result.getColumnIndex("reminders");
+            int pointsIndex = result.getColumnIndex("points");
 
             categoryData = result.getString(categoryIndex);
             infoData = result.getString(infoIndex);
             deadlineData = Long.parseLong(result.getString(deadlineIndex));
             reminderData = result.getString(reminderIndex);
+            pointsData = result.getInt(pointsIndex);
+
+            pointsTextView.setText(pointsTextView.getText().toString()+"\n"+pointsData);
 
             categoryTextView.setText(categoryTextView.getText().toString()+categoryData);
 
@@ -141,6 +148,7 @@ public class ViewTask extends AppCompatActivity {
         editTask.putExtra("info", infoData);
         editTask.putExtra("deadline", deadlineData);
         editTask.putExtra("reminders", reminderData);
+        editTask.putExtra("points", pointsData);
 
         startActivity(editTask);
 

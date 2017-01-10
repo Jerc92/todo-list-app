@@ -41,7 +41,8 @@ public class DatabaseConnector extends SQLiteOpenHelper {
                 "category TEXT, " +
                 "info TEXT, " +
                 "reminders TEXT, " +
-                "deadline TEXT);";
+                "deadline TEXT, " +
+                "points int);";
         final String createQueryCategories = "CREATE TABLE categories" +
                 "(_id integer primary key autoincrement, " +
                 "category TEXT, " +
@@ -61,12 +62,13 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void insertTask(String category, String info, String reminders, String deadline) {
+    public void insertTask(String category, String info, String reminders, String deadline, int points) {
         final ContentValues newTask = new ContentValues();
         newTask.put("category", category);
         newTask.put("info", info);
         newTask.put("reminders", reminders);
         newTask.put("deadline", deadline);
+        newTask.put("points", points);
 
         open();
         database.insert("tasks", null, newTask);
@@ -87,13 +89,14 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         return database.query("tasks", null, "_id="+id, null, null, null, null);
     }
 
-    public void updateTask(long id, String category, String info, String reminders, String deadline) {
+    public void updateTask(long id, String category, String info, String reminders, String deadline, int points) {
         final ContentValues editTask = new ContentValues();
 
         editTask.put("category", category);
         editTask.put("info", info);
         editTask.put("reminders", reminders);
         editTask.put("deadline", deadline);
+        editTask.put("points", points);
 
         open();
         database.update("tasks", editTask, "_id=" + id, null);

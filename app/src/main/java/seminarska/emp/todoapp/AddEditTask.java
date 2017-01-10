@@ -1,18 +1,23 @@
 package seminarska.emp.todoapp;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import java.util.Calendar;
 
@@ -35,11 +40,14 @@ public class AddEditTask extends AppCompatActivity {
     Calendar deadlineCalendar;
     String reminderTimes;
     String category = "others";
+    int points;
 
     TextView categoryTextView;
     EditText infoEditText;
     TextView deadlineTextView;
     TextView reminderTextView;
+    Spinner pointsSpinner;
+    ArrayAdapter<CharSequence> adapter;
 
     Dialog reminderDialog;
     Dialog datePickerDialog;
@@ -59,6 +67,7 @@ public class AddEditTask extends AppCompatActivity {
         infoEditText = (EditText) findViewById(R.id.info_editText);
         reminderTextView = (TextView) findViewById(R.id.reminder_label);
         deadlineTextView = (TextView) findViewById(R.id.deadline_label);
+        pointsSpinner = (Spinner) findViewById(R.id.points_spinner);
 
         deadlineCalendar = Calendar.getInstance();
 
@@ -76,6 +85,16 @@ public class AddEditTask extends AppCompatActivity {
         timePickerDialog.setContentView(R.layout.time_picker);
         timePicker = (TimePicker) timePickerDialog.findViewById(R.id.timePicker);
         timePicker.setIs24HourView(true);
+
+        adapter = ArrayAdapter.createFromResource(this,
+                R.array.points_list, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        pointsSpinner.setAdapter(adapter);
+
+        pointsSpinner.setOnItemSelectedListener(spinnerItemSelected);
+
+        points = Integer.parseInt(adapter.getItem(0).toString());
 
         Bundle extras = getIntent().getExtras();
 
@@ -276,6 +295,9 @@ public class AddEditTask extends AppCompatActivity {
                 checkBox.setChecked(true);
             }
         }
+
+        int position = adapter.getPosition(String.valueOf(extras.getInt("points")));
+        pointsSpinner.setSelection(position);
     }
 
     public void saveTask(View view) {
@@ -312,12 +334,24 @@ public class AddEditTask extends AppCompatActivity {
 
         if(getIntent().getExtras() == null || !getIntent().getExtras().containsKey("row_id")) {
 
-            db.insertTask(category, infoEditText.getText().toString(), reminderTimes, Long.toString(deadlineCalendar.getTimeInMillis()));
+            db.insertTask(category, infoEditText.getText().toString(), reminderTimes, Long.toString(deadlineCalendar.getTimeInMillis()), points);
 
         } else {
 
-            db.updateTask(rowID, category, infoEditText.getText().toString(), reminderTimes, Long.toString(deadlineCalendar.getTimeInMillis()));
+            db.updateTask(rowID, category, infoEditText.getText().toString(), reminderTimes, Long.toString(deadlineCalendar.getTimeInMillis()), points);
 
         }
     }
+
+    AdapterView.OnItemSelectedListener spinnerItemSelected = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            points = Integer.parseInt(adapter.getItem(position).toString());
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
+    };
 }

@@ -83,6 +83,22 @@
                 android:layout_height="1dp"
                 android:background="@android:color/darker_gray"/>
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/points_label"
+                android:onClick="showReminders"
+                android:text="@string/points_label"
+                android:textSize="14sp"
+                android:paddingTop="10sp"
+                android:paddingBottom="10sp"
+                android:lineSpacingExtra="8sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"/>
+
         </LinearLayout>
 
         <LinearLayout
